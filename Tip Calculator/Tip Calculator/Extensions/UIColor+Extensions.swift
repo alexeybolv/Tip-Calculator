@@ -8,7 +8,7 @@
 import UIKit
 
 extension UIColor {
-    convenience init?(hex: String) {
+    convenience init(hex: String) {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
 
@@ -21,7 +21,10 @@ extension UIColor {
 
         let length = hexSanitized.count
 
-        guard Scanner(string: hexSanitized).scanHexInt64(&rgb) else { return nil }
+        guard Scanner(string: hexSanitized).scanHexInt64(&rgb) else {
+            self.init(red: 0, green: 0, blue: 0, alpha: 1)
+            return
+        }
 
         if length == 6 {
             r = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
@@ -35,7 +38,7 @@ extension UIColor {
             a = CGFloat(rgb & 0x000000FF) / 255.0
 
         } else {
-            return nil
+            self.init(red: 0, green: 0, blue: 0, alpha: 1)
         }
 
         self.init(red: r, green: g, blue: b, alpha: a)
