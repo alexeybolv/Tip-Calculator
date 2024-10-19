@@ -47,7 +47,11 @@ class CalculatorViewController: UIViewController {
             splitPublisher: splitInputView.valuePublisher
         )
         
-        let _ = viewModel.transform(input: input)
+        let output = viewModel.transform(input: input)
+        
+        output.updateViewPublisher.sink { [unowned self] result in
+            resultView.configure(result: result)
+        }.store(in: &cancellables)
     }
     
     private func layout() {
