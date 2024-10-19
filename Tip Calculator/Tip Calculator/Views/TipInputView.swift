@@ -91,7 +91,6 @@ class TipInputView: UIView {
     var valuePublisher: AnyPublisher<Tip, Never> {
         return tipSubject.eraseToAnyPublisher()
     }
-    
     private var cancellables = Set<AnyCancellable>()
     
     init() {

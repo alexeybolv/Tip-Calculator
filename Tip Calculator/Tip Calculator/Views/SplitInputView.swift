@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import Combine
+import CombineCocoa
 
 class SplitInputView: UIView {
     
@@ -26,6 +28,10 @@ class SplitInputView: UIView {
                 .layerMinXMinYCorner
             ]
         )
+        button.tapPublisher.flatMap { [unowned self] in
+            Just(self.splitSubject.value == 1 ? 1 : splitSubject.value - 1)
+        }.assign(to: \.value, on: splitSubject)
+            .store(in: &cancellables)
         return button
     }()
     
@@ -37,6 +43,10 @@ class SplitInputView: UIView {
                 .layerMaxXMinYCorner
             ]
         )
+        button.tapPublisher.flatMap { [unowned self] in
+            Just(self.splitSubject.value + 1)
+        }.assign(to: \.value, on: splitSubject)
+            .store(in: &cancellables)
         return button
     }()
     
@@ -60,9 +70,16 @@ class SplitInputView: UIView {
         return stackView
     }()
     
+    private let splitSubject: CurrentValueSubject<Int, Never> = .init(1)
+    var valuePublisher: AnyPublisher<Int, Never> {
+        return splitSubject.removeDuplicates().eraseToAnyPublisher()
+    }
+    private var cancellables = Set<AnyCancellable>()
+    
     init() {
         super.init(frame: .zero)
         layout()
+        observe()
     }
     
     required init?(coder: NSCoder) {
@@ -88,6 +105,12 @@ class SplitInputView: UIView {
             $0.trailing.equalTo(stackView.snp.leading).offset(-24)
             $0.width.equalTo(68)
         }
+    }
+    
+    private func observe() {
+        splitSubject.sink { [unowned self] quantity in
+            quantityLabel.text = "\(quantity)"
+        }.store(in: &cancellables)
     }
     
     private func buildStepperButton(text: String, corners: CACornerMask) -> UIButton {
