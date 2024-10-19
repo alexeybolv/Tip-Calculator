@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 import SnapKit
 
 class CalculatorViewController: UIViewController {
@@ -29,10 +30,24 @@ class CalculatorViewController: UIViewController {
         stackView.spacing = 36
         return stackView
     }()
+    
+    private let viewModel = CalculatorViewModel()
+    private var cancellables = Set<AnyCancellable>()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         layout()
+        bind()
+    }
+    
+    private func bind() {
+        let input = CalculatorViewModel.Input(
+            billPublisher: billInputView.valuePublisher,
+            tipPublisher: tipInputView.valuePublisher,
+            splitPublisher: splitInputView.valuePublisher
+        )
+        
+        let _ = viewModel.transform(input: input)
     }
     
     private func layout() {
