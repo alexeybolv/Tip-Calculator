@@ -97,6 +97,7 @@ class TipInputView: UIView {
     init() {
         super.init(frame: .zero)
         layout()
+        observe()
     }
     
     required init?(coder: NSCoder) {
@@ -146,6 +147,53 @@ class TipInputView: UIView {
             return controller
         }()
         parentViewController?.present(alert, animated: true)
+    }
+    
+    private func observe() {
+        tipSubject.sink { [weak self] tip in
+            self?.resetView()
+            switch tip {
+            case .none:
+                break
+            case .tenPercent:
+                self?.tenPercentTipButton.backgroundColor = ThemeColor.secondary
+            case .fifteenPercent:
+                self?.fifteenPercentTipButton.backgroundColor = ThemeColor.secondary
+            case .twentyPercent:
+                self?.twentyPercentTipButton.backgroundColor = ThemeColor.secondary
+            case .custom(let value):
+                self?.customTipButton.backgroundColor = ThemeColor.secondary
+                let text = NSMutableAttributedString(
+                    string: "$\(value)",
+                    attributes: [
+                        .font: ThemeFont.bold(ofSize: 20)
+                    ]
+                )
+                text.addAttributes(
+                    [
+                        .font: ThemeFont.bold(ofSize: 14)
+                    ],
+                    range: NSRange(location: 0, length: 1)
+                )
+                self?.customTipButton.setAttributedTitle(text, for: .normal)
+            }
+        }.store(in: &cancellables)
+    }
+    
+    private func resetView() {
+        [tenPercentTipButton,
+         fifteenPercentTipButton,
+         twentyPercentTipButton,
+         customTipButton].forEach {
+            $0.backgroundColor = ThemeColor.primary
+        }
+        let text = NSMutableAttributedString(
+            string: "Custom tip",
+            attributes: [
+                .font: ThemeFont.bold(ofSize: 20)
+            ]
+        )
+        customTipButton.setAttributedTitle(text, for: .normal)
     }
     
     private func buildTipButton(tip: Tip) -> UIButton {
