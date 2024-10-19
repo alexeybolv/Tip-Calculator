@@ -47,7 +47,7 @@ class CalculatorViewController: UIViewController {
             splitPublisher: splitInputView.valuePublisher
         )
         
-        let output = viewModel.transform(input: input)
+        let _ = viewModel.transform(input: input)
     }
     
     private func layout() {
