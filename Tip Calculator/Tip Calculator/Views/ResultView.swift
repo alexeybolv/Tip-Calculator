@@ -91,7 +91,6 @@ class ResultView: UIView {
         )
         text.addAttributes([.font: ThemeFont.bold(ofSize: 24)], range: NSMakeRange(0, 1))
         amountPerPersonLabel.attributedText = text
-        print(result.amountPerPerson.currencyFormatted)
         totalBillView.configure(amount: result.totalBill)
         totalTipView.configure(amount: result.totalTip)
     }
