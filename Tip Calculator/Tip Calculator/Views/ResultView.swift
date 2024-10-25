@@ -20,7 +20,7 @@ class ResultView: UIView {
         let label = UILabel()
         label.textAlignment = .center
         let text = NSMutableAttributedString(
-            string: "$0.00",
+            string: "$0",
             attributes: [
                 .font: ThemeFont.bold(ofSize: 48)
             ]
@@ -56,12 +56,22 @@ class ResultView: UIView {
         return stackView
     }()
     
+    private let totalBillView: AmountView = {
+        let view = AmountView(title: "Total bill", textAlignment: .left)
+        return view
+    }()
+    
+    private let totalTipView: AmountView = {
+        let view = AmountView(title: "Total tip", textAlignment: .right)
+        return view
+    }()
+    
     private lazy var hStackView: UIStackView = {
         let stackView = UIStackView(
             arrangedSubviews: [
-                AmountView(title: "Total bill", textAlignment: .left),
+                totalBillView,
                 UIView(),
-                AmountView(title: "Total tip", textAlignment: .right)
+                totalTipView
             ]
         )
         stackView.axis = .horizontal
@@ -72,6 +82,17 @@ class ResultView: UIView {
     init() {
         super.init(frame: .zero)
         layout()
+    }
+    
+    func configure(result: Result) {
+        let text = NSMutableAttributedString(
+            string: result.amountPerPerson.currencyFormatted,
+            attributes: [.font: ThemeFont.bold(ofSize: 48)]
+        )
+        text.addAttributes([.font: ThemeFont.bold(ofSize: 24)], range: NSMakeRange(0, 1))
+        amountPerPersonLabel.attributedText = text
+        totalBillView.configure(amount: result.totalBill)
+        totalTipView.configure(amount: result.totalTip)
     }
     
     required init?(coder: NSCoder) {
